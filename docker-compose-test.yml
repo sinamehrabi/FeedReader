@@ -1,0 +1,10 @@
+version: '3.4'
+
+services:
+  test:
+    build: .
+    restart: on-failure
+    env_file:
+      - ${ENV_FILE:-.env.sample}
+    environment:
+      - MODE=test

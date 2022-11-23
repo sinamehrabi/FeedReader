@@ -1,0 +1,58 @@
+version: '3.4'
+
+services:
+  feed_reader:
+    build: .
+    restart: on-failure
+    env_file:
+      - ${ENV_FILE:-.env.sample}
+    environment:
+      - MODE=web
+    ports:
+      - "8000:8000"
+
+    depends_on:
+      - redis
+      - postgres
+
+    volumes:
+      - ./:/service
+
+  celery:
+    build: .
+    restart: on-failure
+    environment:
+      - MODE=worker
+    env_file:
+      - ${ENV_FILE:-.env.sample}
+    depends_on:
+      - redis
+      - feed_reader
+
+  celery-beat:
+    build: .
+    restart: on-failure
+    environment:
+      - MODE=beat
+    env_file:
+      - ${ENV_FILE:-.env.sample}
+    depends_on:
+      - redis
+      - feed_reader
+
+  redis:
+    image: redis:alpine
+
+
+  postgres:
+    container_name: postgres_container
+    image: postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme}
+      PGDATA: /data/postgres
+    volumes:
+      - ./data/postgres:/data/postgres
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
