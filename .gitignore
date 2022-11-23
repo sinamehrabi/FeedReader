@@ -232,10 +232,10 @@ __pypackages__/
 # Celery stuff
 celerybeat-schedule
 celerybeat.pid
-
+data
 # SageMath parsed files
 *.sage.py
-
+.db
 # Environments
 .env
 .venv
